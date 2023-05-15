@@ -1,0 +1,18 @@
+{
+  "files": [],
+  "references": [{ "path": "./tsconfig.node.json" }, { "path": "./tsconfig.web.json" }],
+  "compilerOptions": {
+    "types": ["element-plus/global"]
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.d.ts",
+    "src/**/*.tsx",
+    "src/**/*.vue",
+    "auto-imports.d.ts" // 此处引入该声明文件
+  ],
+  "baseUrl": "./",
+  "paths": {
+    "@/*": ["src/*"]
+  }
+}
