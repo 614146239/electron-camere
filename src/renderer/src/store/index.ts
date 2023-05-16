@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { ElNotification } from 'element-plus'
 
 interface DeviceArr {
   deviceId: string
@@ -10,7 +11,7 @@ export const useStore = defineStore('store', {
       cameraArr: [] as DeviceArr[],
       audioArr: [] as DeviceArr[],
       config: {
-        borderRadius: '',
+        borderWidth: '',
         borderColor: '',
         reverse: true
         // aspectRatio: 16 / 9
@@ -57,12 +58,41 @@ export const useStore = defineStore('store', {
           // 本地音频在本地扬声器播放
           suppressLocalAudioPlayback: false
         }
-      },
-      voice: false,
-      screen: false
+      }
+      // voice: false,
+      // screen: false
     }
   },
 
   getters: {},
-  actions: {}
+  actions: {
+    // 获取设备列表并存入store
+    async getUserMedia() {
+      await navigator.mediaDevices
+        .enumerateDevices()
+        .then((devices) => {
+          // 遍历设备列表
+          devices.forEach((device) => {
+            // 如果设备类型是视频输入设备，则输出设备信息
+            if (device.kind === 'videoinput') {
+              this.cameraArr.push({
+                label: device.label,
+                deviceId: device.deviceId
+              })
+            }
+            if (device.kind === 'audioinput') {
+              this.audioArr.push({ label: device.label, deviceId: device.deviceId })
+            }
+          })
+        })
+        .catch(function (err) {
+          console.error('获取设备列表失败:', err)
+          ElNotification({
+            title: '获取设备列表失败',
+            message: err,
+            type: 'error'
+          })
+        })
+    }
+  }
 })

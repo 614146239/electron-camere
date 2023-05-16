@@ -1,6 +1,6 @@
 <template>
   <div class="setting">
-    <el-form :model="form" label-width="auto">
+    <el-form :model="config" label-width="auto">
       <el-form-item label="选择摄像头">
         <el-select v-model="constraints.video.deviceId" placeholder="选择摄像头">
           <el-option
@@ -22,10 +22,10 @@
         </el-select>
       </el-form-item>
       <el-form-item label="边框宽度">
-        <el-input v-model="form.borderRadius" placeholder="边框宽度" />
+        <el-input v-model="config.borderWidth" placeholder="边框宽度" />
       </el-form-item>
       <el-form-item label="边框颜色">
-        <el-input v-model="form.borderColor" placeholder="边框颜色" />
+        <el-input v-model="config.borderColor" placeholder="边框颜色" />
       </el-form-item>
     </el-form>
 
@@ -37,11 +37,16 @@
 import { useRouter } from 'vue-router'
 import { useStore } from '../store/index'
 import { ElNotification } from 'element-plus'
+import { reactive } from 'vue'
+
 const store = useStore()
 const router = useRouter()
-const cameraArr = store.cameraArr
-const audioArr = store.audioArr
-const constraints = store.constraints
+store.getUserMedia()
+const constraints = reactive(store.constraints)
+
+const cameraArr = reactive(store.cameraArr)
+const audioArr = reactive(store.audioArr)
+
 console.log(cameraArr)
 console.log(audioArr)
 
@@ -57,13 +62,15 @@ if (audioArr.length === 0) {
     type: 'error'
   })
 }
-const form = store.config
+
+const config = store.config
 
 const herf = (): void => {
   router.push('/index')
 }
 
-// onBeforeMount(() => {})
+// onBeforeMount(() => {
+// })
 </script>
 
 <style scoped lang="less">

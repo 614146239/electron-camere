@@ -5,6 +5,7 @@ import router from './router'
 // import piniaPersist from 'pinia-plugin-persist'
 const app = createApp(App)
 import pinia from './store/store'
+import './assets/css/styles.less'
 // 数据持久化
 // const pinia = createPinia()
 // pinia.use(piniaPersist)

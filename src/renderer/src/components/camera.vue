@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="video"
-    :style="{ borderRadius: config.borderRadius + 'px', borderColor: config.borderRadius }"
-  >
+  <div class="video" :style="borderStyle">
     <video
       ref="videoRef"
       autoplay
@@ -14,18 +11,21 @@
 </template>
 
 <script setup lang="ts">
-import router from '../router'
+// import router from '../router'
 import { useStore } from '../store'
 import { onMounted } from 'vue'
-import { ref } from 'vue'
+import { ref, reactive } from 'vue'
 const videoRef = ref()
 // 数据要从store中存储
 const store = useStore()
-const href = (): void => {
-  router.push('/setting')
-}
+// const href = (): void => {
+//   router.push('/setting')
+// }
 const config = store.config
 const constraints = store.constraints
+const borderStyle = reactive({
+  border: `${config.borderWidth}px  solid  ${config.borderColor}`
+})
 onMounted(() => {
   // 摄像头
   const video = videoRef.value
@@ -46,7 +46,6 @@ video {
   width: inherit;
   height: inherit;
   object-fit: cover;
-  overflow: hidden;
 }
 .reverse {
   // 切换镜像，video旋转y轴180
