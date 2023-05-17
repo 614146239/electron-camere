@@ -6,7 +6,6 @@
       :muted="constraints.audio.muted"
       :class="{ reverse: config.reverse }"
     ></video>
-    <!-- <button @click="href">返回上一层</button> -->
   </div>
 </template>
 
@@ -16,11 +15,9 @@ import { useStore } from '../store'
 import { onMounted } from 'vue'
 import { ref, reactive } from 'vue'
 const videoRef = ref()
+const tracks = ref()
 // 数据要从store中存储
 const store = useStore()
-// const href = (): void => {
-//   router.push('/setting')
-// }
 const config = store.config
 const constraints = store.constraints
 const borderStyle = reactive({
@@ -31,7 +28,16 @@ onMounted(() => {
   const video = videoRef.value
   navigator.mediaDevices.getUserMedia(constraints).then((stream) => {
     video.srcObject = stream
+    tracks.value = stream.getTracks()
   })
+})
+// 关闭所有流媒体
+onBeforeUnmount(() => {
+  tracks.value.forEach(function (track) {
+    track.stop()
+  })
+
+  videoRef.value.srcObject = null
 })
 </script>
 
@@ -41,6 +47,9 @@ onMounted(() => {
   height: 100vh;
   border-radius: 50%;
   overflow: hidden;
+  z-index: 9999;
+  // 可以拖动窗口
+  -webkit-app-region: drag;
 }
 video {
   width: inherit;

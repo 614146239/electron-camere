@@ -1,15 +1,29 @@
-import { contextBridge } from 'electron'
+import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 
-// Custom APIs for renderer
-const api = {}
+// 用于渲染器的自定义 API
+// 渲染进程向主进程
+const api = {
+  chageFrame: (frame): void => {
+    ipcRenderer.send('frame', frame)
+  },
+  contextMenu: () => {
+    ipcRenderer.send('contextMenu')
+  }
+}
+// 主进程向渲染进程
+const electron = {
+  hrefSetting: (callback) => {
+    ipcRenderer.on('hrefSetting', callback)
+  }
+}
 
-// Use `contextBridge` APIs to expose Electron APIs to
-// renderer only if context isolation is enabled, otherwise
-// just add to the DOM global.
+// 使用“contextBridge”API仅在启用上下文隔离时才向渲染器公开Electron API，
+// 否则只需添加到DOM全局
 if (process.contextIsolated) {
   try {
-    contextBridge.exposeInMainWorld('electron', electronAPI)
+    // 向渲染进程通知
+    contextBridge.exposeInMainWorld('electron', { ...electronAPI, ...electron })
     contextBridge.exposeInMainWorld('api', api)
   } catch (error) {
     console.error(error)

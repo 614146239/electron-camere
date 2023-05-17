@@ -24,9 +24,8 @@ select {
 }
 
 body {
-  font: 12px '宋体', 'Arial Narrow', HELVETICA;
-  background: #fff;
   -webkit-text-size-adjust: 100%;
+  background-color: #fff;
   // 可以拖动窗口
   -webkit-app-region: drag;
 }
@@ -81,4 +80,8 @@ body,
   height: 100%;
   overflow: hidden;
   background-color: transparent;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }

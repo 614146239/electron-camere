@@ -7,9 +7,9 @@
   "include": [
     "src/**/*.ts",
     "src/**/*.d.ts",
-    "src/**/*.tsx",
     "src/**/*.vue",
-    "auto-imports.d.ts" // 此处引入该声明文件
+    "src/preload/index.d.ts",
+    "auto-imports.d.ts", // 此处引入该声明文件
   ],
   "baseUrl": "./",
   "paths": {
