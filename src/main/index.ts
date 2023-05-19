@@ -13,7 +13,8 @@ import { createTray } from './tray'
 import './autoUpdater'
 // 录制屏幕
 import screenCapturer from './desktopCapturer '
-
+// 拖动
+import drag from './drag'
 function createWindow(): void {
   // 创建浏览器窗口
   const mainWindow = new BrowserWindow({
@@ -22,7 +23,7 @@ function createWindow(): void {
     show: false,
     autoHideMenuBar: true, //自动隐藏菜单栏
     alwaysOnTop: true, //是否保持在最上层
-    frame: true, //windows去除标题栏和窗口控制按钮
+    frame: false, //windows去除标题栏和窗口控制按钮
     transparent: true, //窗口背景透明
     skipTaskbar: true, //是否在任务栏中显示窗口
     resizable: true, //窗口是否可以改变尺寸
@@ -71,6 +72,8 @@ function createWindow(): void {
 
   //右键菜单
   menu(mainWindow)
+  // 拖动
+  drag(mainWindow)
 }
 
 // 这段程序将会在 Electron 结束初始化

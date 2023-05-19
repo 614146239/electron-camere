@@ -8,6 +8,10 @@ const api = {
   contextMenu: (e) => {
     e.preventDefault()
     ipcRenderer.send('contextMenu')
+  },
+  // 拖动
+  drag: (opt: { x: number; y: number }) => {
+    ipcRenderer.invoke('drag', opt)
   }
 }
 // 主进程向渲染进程
