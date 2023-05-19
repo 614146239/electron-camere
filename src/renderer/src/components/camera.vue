@@ -16,6 +16,7 @@ import { onMounted } from 'vue'
 import { ref, reactive } from 'vue'
 const videoRef = ref()
 const tracks = ref()
+
 // 数据要从store中存储
 const store = useStore()
 const config = store.config
@@ -30,13 +31,13 @@ onMounted(() => {
     video.srcObject = stream
     tracks.value = stream.getTracks()
   })
+  // 音频
 })
 // 关闭所有流媒体
 onBeforeUnmount(() => {
   tracks.value.forEach(function (track) {
     track.stop()
   })
-
   videoRef.value.srcObject = null
 })
 </script>

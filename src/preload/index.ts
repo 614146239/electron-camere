@@ -4,17 +4,21 @@ import { electronAPI } from '@electron-toolkit/preload'
 // 用于渲染器的自定义 API
 // 渲染进程向主进程
 const api = {
-  chageFrame: (frame): void => {
-    ipcRenderer.send('frame', frame)
-  },
-  contextMenu: () => {
+  // 右键菜单
+  contextMenu: (e) => {
+    e.preventDefault()
     ipcRenderer.send('contextMenu')
   }
 }
 // 主进程向渲染进程
 const electron = {
+  // 跳转到设置页面
   hrefSetting: (callback) => {
     ipcRenderer.on('hrefSetting', callback)
+  },
+  // 录屏未实现
+  screenCapturer: (callback) => {
+    ipcRenderer.on('screenCapturer', callback)
   }
 }
 

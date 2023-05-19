@@ -74,7 +74,6 @@ const predefineColors = ref([
   '#c7158577'
 ])
 const changeColor = (e): void => {
-  console.log(e)
   config.borderColor = e
 }
 if (cameraArr.length === 0) {

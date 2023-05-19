@@ -1,6 +1,6 @@
 <template>
   <Camere></Camere>
-  <Screen></Screen>
+  <!-- <Screen></Screen> -->
 </template>
 
 <script setup lang="ts">

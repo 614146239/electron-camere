@@ -4,10 +4,16 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/windowTray.png?asset'
 // 菜单
-import './menu'
+// import './menu'
+import menu from './menu'
 import './setUserTasks'
 // 托盘
 import { createTray } from './tray'
+// 更新
+import './autoUpdater'
+// 录制屏幕
+import screenCapturer from './desktopCapturer '
+
 function createWindow(): void {
   // 创建浏览器窗口
   const mainWindow = new BrowserWindow({
@@ -17,7 +23,7 @@ function createWindow(): void {
     autoHideMenuBar: true, //自动隐藏菜单栏
     alwaysOnTop: true, //是否保持在最上层
     frame: true, //windows去除标题栏和窗口控制按钮
-    transparent: false, //窗口背景透明
+    transparent: true, //窗口背景透明
     skipTaskbar: true, //是否在任务栏中显示窗口
     resizable: true, //窗口是否可以改变尺寸
     minWidth: 200,
@@ -53,16 +59,18 @@ function createWindow(): void {
     // 加载 index.html
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
-  // 通信
-  // console.log(mainWindow)
-
-  // ipcMain.on('frame', (event, frame) => {
-  //   console.log(event, frame)
-  //   // mainWindow.frame = frame
-  // })
 
   // 创建系统托盘
   createTray(mainWindow)
+  // 录制屏幕
+  screenCapturer(mainWindow)
+  // 设置dock图标
+  if (process.platform === 'darwin') {
+    app.dock.setIcon(icon)
+  }
+
+  //右键菜单
+  menu(mainWindow)
 }
 
 // 这段程序将会在 Electron 结束初始化
@@ -71,7 +79,6 @@ function createWindow(): void {
 app.whenReady().then(() => {
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
-
   // 开发中的 F12 默认打开或关闭 DevTools
   // 并忽略生产中的 CommandOrControl + R。
   // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
