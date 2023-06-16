@@ -10,19 +10,22 @@ const api = {
     ipcRenderer.send('contextMenu')
   },
   // 拖动
-  drag: (opt: { x: number; y: number }) => {
-    ipcRenderer.invoke('drag', opt)
+  drag: async (opt: { x: number; y: number }) => {
+    await ipcRenderer.invoke('drag', opt)
+  },
+  recording: async () => {
+    ipcRenderer.send('recording')
   }
 }
 // 主进程向渲染进程
 const electron = {
   // 跳转到设置页面
-  hrefSetting: (callback) => {
-    ipcRenderer.on('hrefSetting', callback)
+  href: (arg) => {
+    ipcRenderer.on('href', arg)
   },
-  // 录屏未实现
-  screenCapturer: (callback) => {
-    ipcRenderer.on('screenCapturer', callback)
+  // 录屏
+  screenCapturer: (arg) => {
+    ipcRenderer.once('screenCapturer', arg)
   }
 }
 

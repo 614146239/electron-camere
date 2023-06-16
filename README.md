@@ -11,26 +11,26 @@ An Electron +Vue+pinia +TypeScript+elementPlus
 ### Install
 
 ```bash
-$ npm install
+$ pnpm install
 ```
 
 ### Development
 
 ```bash
-$ npm run dev
+$ pnpm run dev
 ```
 
 ### Build
 
 ```bash
 # For windows
-$ npm run build:win
+$ pnpm run build:win
 
 # For macOS
-$ npm run build:mac
+$ pnpm run build:mac
 
 # For Linux
-$ npm run build:linux
+$ pnpm run build:linux
 
 ```
 
@@ -53,6 +53,104 @@ constraints 参数在 store/index.ts 中
 请注意, 如果您已使整个窗口 draggable, 则必须将按钮标记为 non-draggable, 否则用户将无法单击它们:
 button { -webkit-app-region: no-drag; }
 
-<!--  -->
+<!-- 获取设备 -->
+  async getUserMedia() {
+      await navigator.mediaDevices
+        .enumerateDevices()
+        .then((devices) => {
+          // 遍历设备列表
+          devices.forEach((device) => {
+            // 如果设备类型是视频输入设备，则输出设备信息
+            if (device.kind === 'videoinput') {
+              this.cameraArr.push({
+                label: device.label,
+                deviceId: device.deviceId
+              })
+            }
+            if (device.kind === 'audioinput') {
+              this.audioArr.push({ label: device.label, deviceId: device.deviceId })
+            }
+          })
+        })
+        .catch(function (err) {
+          console.error('获取设备列表失败:', err)
+          ElNotification({
+            title: '获取设备列表失败',
+            message: err,
+            type: 'error'
+          })
+        })
+    }
+<!-- 进程通讯 -->
 
 分为主进程和渲染进程，preload 预渲染主进程和渲染进程之间通信
+进程通讯多次触发情况下使用 `ipcRenderer.once`和 `ipcRenderer.on`一样
+
+
+<!--  -->
+
+录制屏幕
+录制屏幕需要electron 通过desktopCapturer获取设备窗口id
+desktopCapturer
+      .getSources({
+        types: ['screen'],
+        // thumbnailSize: {
+        //   height: 300, // 窗口或屏幕的截图快照高度
+        //   width: 300 // 窗口或屏幕的截图快照宽度
+        // },
+        fetchWindowIcons: true // 如果视频源是窗口且有图标，则设置该值可以捕获到的窗口图标
+      })
+      .then(async (sources) => {
+        source = sources[0]
+        // mainWindow.webContents.send('screenCapturer', source.id)
+        return source.id
+      })
+之后通过`navigator.mediaDevices.getUserMedia`(constraints as any)获取屏幕流
+
+ const constraints = {
+        audio: {
+          mandatory: {
+            // 无需指定mediaSourceId就可以录音了，录得是系统音频
+            chromeMediaSource: 'desktop'
+          }
+        },
+        video: {
+          mandatory: {
+            chromeMediaSource: 'desktop',
+            chromeMediaSourceId: sourceId,
+            width: { ideal: 1920 },
+            height: { ideal: 1080 },
+            codec: 'vp9',
+            // 帧率
+            maxFrameRate: 60
+          }
+        }
+      }
+constraints中属性不能通过getdisplayMedia获取
+
+音频轨道需要额外获取
+ audioStream = await navigator.mediaDevices.getUserMedia({
+      audio: true
+    })
+
+    同时通过
+      const stream = new MediaStream([
+        screenStream.getVideoTracks()[0],
+        audioStream.getAudioTracks()[0]
+      ])合并视频流与音频流
+
+  录制视频需要MediaRecorder(stream)
+闲置中，录制中,暂停 inactive, recording, or paused
+
+录制中push进数组中通过blob下载
+  recorder.addEventListener('dataavailable', (e) => {
+    chunks.push(e.data)
+  })
+<!-- 下载 -->
+const blob = new Blob(chunks, { type: 'video/webm;codecs=vp9' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      const currentTime = new Date()
+      a.download = `${currentTime.toLocaleString()}.mp4`
+      a.click()

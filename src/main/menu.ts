@@ -5,7 +5,13 @@ const menu = (mainWindow) => {
     {
       label: '设置',
       click: () => {
-        mainWindow.webContents.send('hrefSetting', 1)
+        mainWindow.webContents.send('href', 'setting')
+      }
+    },
+    {
+      label: '屏幕录制',
+      click: () => {
+        mainWindow.webContents.send('href', 'index')
       }
     }
   ] as MenuItemConstructorOptions[]
@@ -16,7 +22,6 @@ const menu = (mainWindow) => {
   mainWindow.webContents.on('context-menu', (e) => {
     e.preventDefault()
     Menu.setApplicationMenu(null)
-
     menu.popup()
   })
 }

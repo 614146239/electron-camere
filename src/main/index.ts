@@ -1,5 +1,5 @@
 // 控制应用生命周期和创建原生浏览器窗口的模组
-import { app, shell, BrowserWindow } from 'electron'
+import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/windowTray.png?asset'
@@ -44,6 +44,11 @@ function createWindow(): void {
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
+
+    //渲染进程向主进程通信
+    ipcMain.on('recording', (event) => {
+      event.reply('screenCapturer', screenCapturer())
+    })
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {

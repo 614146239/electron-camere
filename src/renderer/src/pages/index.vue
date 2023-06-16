@@ -1,10 +1,10 @@
 <template>
-  <Camere></Camere>
-  <!-- <Screen></Screen> -->
+  <!-- <Camere></Camere> -->
+  <Screen></Screen>
 </template>
 
 <script setup lang="ts">
-import Camere from '../components/camera.vue'
+// import Camere from '../components/camera.vue'
 import Screen from '../components/screen.vue'
 </script>
 

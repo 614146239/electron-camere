@@ -42,10 +42,10 @@ onBeforeUnmount(() => {
 })
 </script>
 
-<style scoped lang="less">
+<style scoped lang="scss">
 .video {
-  width: 100vw;
-  height: 100vh;
+  width: 10vw;
+  height: 10vh;
   border-radius: 50%;
   overflow: hidden;
   z-index: 9999;

@@ -14,7 +14,6 @@ export const useStore = defineStore('store', {
         borderWidth: '',
         borderColor: '',
         reverse: true
-        // aspectRatio: 16 / 9
       },
       constraints: {
         // 摄像头
@@ -59,8 +58,6 @@ export const useStore = defineStore('store', {
           suppressLocalAudioPlayback: false
         }
       }
-      // voice: false,
-      // screen: false
     }
   },
 
