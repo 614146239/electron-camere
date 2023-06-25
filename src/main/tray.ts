@@ -31,12 +31,6 @@ const createTray = (mainWindow) => {
       type: 'separator'
     },
     {
-      label: '设置',
-      click: () => {
-        mainWindow.webContents.send('hrefSetting')
-      }
-    },
-    {
       type: 'separator'
     },
     { label: '退出程序', role: 'quit' }

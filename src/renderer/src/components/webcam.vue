@@ -10,13 +10,14 @@
 </template>
 
 <script setup lang="ts">
-// import router from '../router'
 import { useStore } from '../store'
-import { onMounted } from 'vue'
+import { onMounted, onBeforeUnmount } from 'vue'
 import { ref, reactive } from 'vue'
+import drag from '../utils/drag'
+import { useRoute } from 'vue-router'
 const videoRef = ref()
 const tracks = ref()
-
+const route = useRoute()
 // 数据要从store中存储
 const store = useStore()
 const config = store.config
@@ -25,9 +26,10 @@ const borderStyle = reactive({
   border: `${config.borderWidth}px  solid  ${config.borderColor}`
 })
 onMounted(() => {
+  drag(Number(route.query.id))
   // 摄像头
   const video = videoRef.value
-  navigator.mediaDevices.getUserMedia(constraints).then((stream) => {
+  navigator.mediaDevices.getUserMedia({ video: constraints.video }).then((stream) => {
     video.srcObject = stream
     tracks.value = stream.getTracks()
   })
@@ -42,15 +44,15 @@ onBeforeUnmount(() => {
 })
 </script>
 
-<style scoped lang="scss">
+<style scoped lang="less">
 .video {
-  width: 10vw;
-  height: 10vh;
+  width: 100vw;
+  height: 100vh;
   border-radius: 50%;
   overflow: hidden;
   z-index: 9999;
   // 可以拖动窗口
-  -webkit-app-region: drag;
+  // -webkit-app-region: drag;
 }
 video {
   width: inherit;

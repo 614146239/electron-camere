@@ -3,27 +3,32 @@ import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/windowTray.png?asset'
+
 // 菜单
-// import './menu'
 import menu from './menu'
 import './setUserTasks'
 // 托盘
 import { createTray } from './tray'
 // 更新
 import './autoUpdater'
-// 录制屏幕
-import screenCapturer from './desktopCapturer '
+
 // 拖动
-import drag from './drag'
+// import drag from './drag'
+
+// 窗口类
+import Window from './createWin'
+const window = new Window()
+
 function createWindow(): void {
   // 创建浏览器窗口
-  const mainWindow = new BrowserWindow({
+
+  const mainWindow = window.createWindows({
     width: 600,
     height: 600,
     show: false,
     autoHideMenuBar: true, //自动隐藏菜单栏
-    alwaysOnTop: true, //是否保持在最上层
-    frame: false, //windows去除标题栏和窗口控制按钮
+    alwaysOnTop: false, //是否保持在最上层
+    // frame: false, //windows去除标题栏和窗口控制按钮
     transparent: true, //窗口背景透明
     skipTaskbar: true, //是否在任务栏中显示窗口
     resizable: true, //窗口是否可以改变尺寸
@@ -39,46 +44,23 @@ function createWindow(): void {
       // webSecurity: false//是否禁用同源策略
     }
   })
+  window.listen()
+
   // 长宽比率为1
-  mainWindow.setAspectRatio(1)
-
-  mainWindow.on('ready-to-show', () => {
-    mainWindow.show()
-
-    //渲染进程向主进程通信
-    ipcMain.on('recording', (event) => {
-      event.reply('screenCapturer', screenCapturer())
-    })
-  })
-
-  mainWindow.webContents.setWindowOpenHandler((details) => {
-    shell.openExternal(details.url)
-    return { action: 'deny' }
-  })
-  // 打开调式工具
-  if (is.dev) mainWindow.webContents.openDevTools()
-  // HMR 用于基于electron cli 的渲染器。
-  // 加载用于开发的远程 URL 或用于生产的本地 html 文件。
-  if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-    mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
-  } else {
-    // 加载 index.html
-    mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
-  }
+  // mainWindow.setAspectRatio(1)
 
   // 创建系统托盘
   createTray(mainWindow)
   // 录制屏幕
-  screenCapturer(mainWindow)
+  // screenCapturer()
   // 设置dock图标
   if (process.platform === 'darwin') {
     app.dock.setIcon(icon)
   }
-
   //右键菜单
   menu(mainWindow)
   // 拖动
-  drag(mainWindow)
+  // drag(mainWindow)
 }
 
 // 这段程序将会在 Electron 结束初始化
@@ -93,6 +75,8 @@ app.whenReady().then(() => {
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
   })
+
+  // recordWindow(mainWindow)
 
   createWindow()
 

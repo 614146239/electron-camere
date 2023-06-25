@@ -13,7 +13,9 @@ export const useStore = defineStore('store', {
       config: {
         borderWidth: '',
         borderColor: '',
-        reverse: true
+        reverse: true,
+        isRecording: false,
+        isWebcam: true
       },
       constraints: {
         // 摄像头
@@ -72,15 +74,22 @@ export const useStore = defineStore('store', {
           devices.forEach((device) => {
             // 如果设备类型是视频输入设备，则输出设备信息
             if (device.kind === 'videoinput') {
-              this.cameraArr.push({
-                label: device.label,
-                deviceId: device.deviceId
-              })
+              if (!this.cameraArr.find((item) => item.deviceId === device.deviceId)) {
+                this.cameraArr.push({
+                  label: device.label,
+                  deviceId: device.deviceId
+                })
+              }
             }
             if (device.kind === 'audioinput') {
-              this.audioArr.push({ label: device.label, deviceId: device.deviceId })
+              if (!this.audioArr.find((item) => item.deviceId === device.deviceId)) {
+                this.audioArr.push({ label: device.label, deviceId: device.deviceId })
+              }
             }
           })
+
+          this.constraints.video.deviceId = this.cameraArr[0].deviceId
+          this.constraints.audio.deviceId = this.audioArr[0].deviceId
         })
         .catch(function (err) {
           console.error('获取设备列表失败:', err)
@@ -90,6 +99,21 @@ export const useStore = defineStore('store', {
             type: 'error'
           })
         })
+    },
+    // 关闭窗口
+    closeWindow(winId) {
+      console.log(window.api)
+
+      window.api.closeWindow(winId)
     }
+  },
+  persist: {
+    enabled: true,
+    strategies: [
+      {
+        key: 'store',
+        storage: localStorage
+      }
+    ]
   }
 })

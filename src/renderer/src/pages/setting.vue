@@ -24,6 +24,21 @@
       <el-form-item label="边框宽度">
         <el-input v-model="config.borderWidth" placeholder="边框宽度" />
       </el-form-item>
+
+      <el-form-item label="摄像头">
+        <el-radio-group v-model="config.isWebcam" class="ml-4">
+          <el-radio :label="true" border>是</el-radio>
+          <el-radio :label="false" border>否</el-radio>
+        </el-radio-group>
+      </el-form-item>
+
+      <el-form-item label="录制屏幕">
+        <el-radio-group v-model="config.isRecording" class="ml-4">
+          <el-radio :label="true" border>是</el-radio>
+          <el-radio :label="false" border>否</el-radio>
+        </el-radio-group>
+      </el-form-item>
+
       <el-form-item label="边框颜色">
         <el-color-picker
           v-model="config.borderColor"
@@ -35,26 +50,22 @@
       </el-form-item>
     </el-form>
 
-    <button @click="herf">去视频</button>
+    <el-button type="primary" @click="submit">确认</el-button>
   </div>
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router'
 import { useStore } from '../store/index'
 import { ElNotification } from 'element-plus'
-import { reactive } from 'vue'
-
+import { reactive, ref } from 'vue'
+import { createWindow } from '../store/createWindow'
+const win = createWindow()
 const store = useStore()
-const router = useRouter()
 store.getUserMedia()
-const config = store.config
+const config = reactive(store.config)
 const constraints = reactive(store.constraints)
 const cameraArr = reactive(store.cameraArr)
 const audioArr = reactive(store.audioArr)
-
-// console.log(window.api.chageFrame)
-// window.api.changeFrame()
 
 // 预定义颜色
 const predefineColors = ref([
@@ -89,8 +100,13 @@ if (audioArr.length === 0) {
   })
 }
 
-const herf = (): void => {
-  router.push('/index')
+const submit = (): void => {
+  if (config.isRecording) {
+    win.recordWindow()
+  }
+  if (config.isWebcam) {
+    win.cameraWindow()
+  }
 }
 </script>
 
@@ -107,5 +123,8 @@ const herf = (): void => {
 }
 :deep(.el-color-picker, .el-popper) {
   -webkit-app-region: no-drag;
+}
+:deep(.el-radio) {
+  color: #fff;
 }
 </style>

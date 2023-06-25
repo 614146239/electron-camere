@@ -4,7 +4,8 @@ import { desktopCapturer } from 'electron'
 let source
 const screenCapturer = () => {
   if (source) {
-    // mainWindow.webContents.send('screenCapturer', source.id)
+    console.log(source)
+
     return source.id
   } else {
     desktopCapturer
@@ -16,9 +17,8 @@ const screenCapturer = () => {
         // },
         fetchWindowIcons: true // 如果视频源是窗口且有图标，则设置该值可以捕获到的窗口图标
       })
-      .then(async (sources) => {
+      .then((sources) => {
         source = sources[0]
-        // mainWindow.webContents.send('screenCapturer', source.id)
         return source.id
       })
   }

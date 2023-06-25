@@ -10,11 +10,21 @@ const api = {
     ipcRenderer.send('contextMenu')
   },
   // 拖动
-  drag: async (opt: { x: number; y: number }) => {
-    await ipcRenderer.invoke('drag', opt)
+  drag: async (opt: { x: number; y: number }, winId) => {
+    await ipcRenderer.invoke('drag', opt, winId)
   },
-  recording: async () => {
-    ipcRenderer.send('recording')
+  // 录制
+  recording: () => {
+    return ipcRenderer.invoke('recording')
+  },
+
+  // 创建窗口
+  createWindow: (args) => {
+    ipcRenderer.send('createWindow', args)
+  },
+  // 关闭窗口
+  closeWindow: (winId) => {
+    ipcRenderer.send('closeWindow', winId)
   }
 }
 // 主进程向渲染进程

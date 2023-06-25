@@ -33,7 +33,7 @@ $ pnpm run build:mac
 $ pnpm run build:linux
 
 ```
-
+该项目参考后盾人代码 网址https://doc.houdunren.com/%E7%B3%BB%E7%BB%9F%E8%AF%BE%E7%A8%8B/electron/1%20%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86.html#%E4%B8%BB%E8%BF%9B%E7%A8%8B
 <!--  -->
 
 获取摄像头并赋值给 video 播放

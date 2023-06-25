@@ -2,17 +2,22 @@ import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router'
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
-    redirect: '/index'
-  },
-  {
-    path: '/index',
-    name: 'index',
-    component: () => import('../pages/index.vue')
+    redirect: '/setting'
   },
   {
     path: '/setting',
     name: 'setting',
     component: () => import('../pages/setting.vue')
+  },
+  {
+    path: '/recording',
+    name: 'recording',
+    component: () => import('../components/screen.vue')
+  },
+  {
+    path: '/webcam',
+    name: 'webcam',
+    component: () => import('../components/webcam.vue')
   }
 ]
 const router = createRouter({
