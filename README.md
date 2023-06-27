@@ -162,3 +162,20 @@ win.loadFile(path.join(__dirname, '../renderer/index.html'), { hash: 'home' })
 对于 vue-router，你应该使用 createWebHashHistory 而不是 createWebHistory。
 对于 react-router-dom，你应该使用 HashRouter 而不是 BrowserRouter。
 当使用 hash 路由时，可以通过 BrowserWindow.loadFile 的第二个参数设置 hash 值来加载页面。
+<!-- 打包配置  生成可执行.exe文件-->
+"build": {
+  "appId": "com.example.my-electron-app",
+  "win": {
+  <!-- 你需要添加一个 win 字段，这是用于配置 Windows 平台的打包选项。在 win 字段中，你需要指定 target 为 nsis，这是一个创建 Windows 安装程序的脚本工具 -->
+    "target": "nsis"
+  },
+  <!-- directories 字段，这是用于配置构建资源的目录 -->
+  "directories": {
+    "buildResources": "build"
+  },
+  <!-- allowToChangeInstallationDirectory 字段启用了用户选择安装路径的功能 -->
+  "nsis": {
+       "oneClick": false,
+    "allowToChangeInstallationDirectory": true
+  }
+}

@@ -51,8 +51,17 @@
     "vue": "^3.2.47",
     "vue-tsc": "^1.2.0"
   },
-  "permissions": [
-    "audioCapture",
-    "videoCapture"
-  ]
+  "build": {
+    "appId": "com.example.my-electron-app",
+    "win": {
+      "target": "nsis"
+    },
+    "directories": {
+      "buildResources": "build"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  }
 }

@@ -26,11 +26,12 @@ function createWindow(): void {
     width: 600,
     height: 600,
     show: false,
+    isMainWin: true,
     autoHideMenuBar: true, //自动隐藏菜单栏
     alwaysOnTop: false, //是否保持在最上层
     // frame: false, //windows去除标题栏和窗口控制按钮
     transparent: true, //窗口背景透明
-    skipTaskbar: true, //是否在任务栏中显示窗口
+    skipTaskbar: false, //是否在任务栏中显示窗口
     resizable: true, //窗口是否可以改变尺寸
     minWidth: 200,
     titleBarStyle: 'default', //mac下隐藏导航栏

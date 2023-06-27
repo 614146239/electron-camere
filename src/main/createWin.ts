@@ -115,6 +115,17 @@ class Window {
     win.once('ready-to-show', () => {
       win.show()
     })
+
+    // 当窗口被关闭时触发
+    win.on('close', (event) => {
+      if (windowConfig.isMainWin) {
+        // 阻止默认行为
+        event.preventDefault()
+        // 隐藏窗口
+        win.hide()
+      }
+    })
+
     win.webContents.setWindowOpenHandler((details) => {
       shell.openExternal(details.url)
       return { action: 'deny' }

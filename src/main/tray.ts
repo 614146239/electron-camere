@@ -1,4 +1,4 @@
-import { Menu, Tray } from 'electron'
+import { app, Menu, Tray } from 'electron'
 import path from 'path'
 // 系统托盘
 const createTray = (mainWindow) => {
@@ -33,7 +33,12 @@ const createTray = (mainWindow) => {
     {
       type: 'separator'
     },
-    { label: '退出程序', role: 'quit' }
+    {
+      label: '退出程序',
+      click: () => {
+        app.exit()
+      }
+    }
   ])
   tray.setContextMenu(contextMenu)
 }
