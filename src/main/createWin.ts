@@ -1,15 +1,12 @@
 import {
-  app,
   BrowserWindow,
   BrowserWindowConstructorOptions,
   ipcMain,
-  Menu,
   nativeImage,
-  shell,
-  webFrameMain,
-  Tray
+  shell
 } from 'electron'
 import { join } from 'path'
+// import url from 'url'
 import { is } from '@electron-toolkit/utils'
 // 录制屏幕
 import screenCapturer from './desktopCapturer '
@@ -95,9 +92,10 @@ class Window {
       id: win.id
     })
 
-    win.on('close', () => win.setOpacity(0))
+    // win.on('close', () => win.setOpacity(0))
     // 打开网址（加载页面）
     // HMR 用于基于electron cli 的渲染器。
+    // 只能用hash模式
     if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
       if (windowConfig.path) {
         win.loadURL(process.env['ELECTRON_RENDERER_URL'] + `#${windowConfig.path}?id=${win.id}`)
@@ -106,9 +104,14 @@ class Window {
       }
     } else {
       // 加载 index.html
-      win.loadFile(join(__dirname, '../renderer/index.html'))
+      if (windowConfig.path) {
+        win.loadFile(join(__dirname, '../renderer/index.html'), {
+          hash: `${windowConfig.path}?id=${win.id}`
+        })
+      } else {
+        win.loadFile(join(__dirname, '../renderer/index.html'))
+      }
     }
-
     win.once('ready-to-show', () => {
       win.show()
     })
@@ -117,14 +120,6 @@ class Window {
       return { action: 'deny' }
     })
 
-    // 屏蔽窗口菜单（-webkit-app-region: drag）
-    win.hookWindowMessage(278, function (e) {
-      win.setEnabled(false)
-      setTimeout(() => {
-        win.setEnabled(true)
-      }, 100)
-      return true
-    })
     const icon = nativeImage.createFromPath(join(__dirname, '../../resources/windowTray.png'))
     win.setIcon(icon)
 
@@ -134,11 +129,11 @@ class Window {
     // 录制
     ipcMain.handle('recording', screenCapturer)
     // 创建窗口
-    ipcMain.on('createWindow', (e, args) => {
+    ipcMain.on('createWindow', (_, args) => {
       this.createWindows(args)
     })
     // 关闭窗口
-    ipcMain.on('closeWindow', (e, winId) => {
+    ipcMain.on('closeWindow', (_, winId) => {
       if (winId) {
         this.getWindow(Number(winId))?.close()
         this.windowArr = this.windowArr.filter((item) => {
@@ -147,10 +142,10 @@ class Window {
       }
     })
     //无边框 窗口移动
-    ipcMain.handle('drag', (event, move, winId) => {
+    ipcMain.handle('drag', (_, move, winId) => {
       if (winId) {
         const win = this.getWindow(Number(winId))
-        const winBounds = win.getBounds()
+        const winBounds = win!.getBounds()
         win?.setBounds({
           x: winBounds.x + move.x,
           y: winBounds.y + move.y,

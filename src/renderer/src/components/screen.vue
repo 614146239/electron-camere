@@ -61,9 +61,9 @@ const store = useStore()
 const config = store.config
 const audio = store.constraints.audio
 // 录制视频
-const recorder = ref(null)
+const recorder = ref()
 let mediaStream: MediaStream
-const chunks = [] as any
+let chunks = [] as any
 const muted = ref(false)
 const audioStream = ref()
 const vidioStream = ref()
@@ -177,6 +177,7 @@ const endRecorder = (): void => {
       a.click()
     })
     recorder.value = null
+    chunks = []
   }
 }
 

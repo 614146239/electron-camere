@@ -21,7 +21,6 @@ const routes: Array<RouteRecordRaw> = [
   }
 ]
 const router = createRouter({
-  // 使用hash(createWebHashHistory)模式，(createWebHistory是HTML5历史模式，支持SEO)
   history: createWebHashHistory(),
   routes
 })

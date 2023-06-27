@@ -154,3 +154,11 @@ const blob = new Blob(chunks, { type: 'video/webm;codecs=vp9' })
       const currentTime = new Date()
       a.download = `${currentTime.toLocaleString()}.mp4`
       a.click()
+
+<!-- 多页面加载问题 -->
+win.loadFile(path.join(__dirname, '../renderer/index.html'), { hash: 'home' })
+
+   Electron 不处理（浏览器）历史并使用同步 URL 加载页面。所以只有 hash 路由 可以工作。
+对于 vue-router，你应该使用 createWebHashHistory 而不是 createWebHistory。
+对于 react-router-dom，你应该使用 HashRouter 而不是 BrowserRouter。
+当使用 hash 路由时，可以通过 BrowserWindow.loadFile 的第二个参数设置 hash 值来加载页面。
