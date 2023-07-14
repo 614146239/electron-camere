@@ -184,8 +184,6 @@ const endRecorder = (): void => {
 const beginRecorder = async (): Promise<void> => {
   // bug 主进程异步消息第一次无法返回窗口id
   const sourceId = await window.api.recording()
-  console.log(sourceId)
-
   try {
     const constraints = {
       audio: {

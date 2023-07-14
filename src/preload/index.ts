@@ -29,13 +29,13 @@ const api = {
 }
 // 主进程向渲染进程
 const electron = {
-  // 跳转到设置页面
-  href: (arg) => {
-    ipcRenderer.on('href', arg)
-  },
   // 录屏
   screenCapturer: (arg) => {
     ipcRenderer.once('screenCapturer', arg)
+  },
+  // 下载进度条
+  downloadProgress: (callback) => {
+    ipcRenderer.on('downloadProgress', callback)
   }
 }
 

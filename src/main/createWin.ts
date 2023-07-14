@@ -49,7 +49,6 @@ class Window {
       webPreferences: {
         preload: join(__dirname, '../preload/index.js'),
         sandbox: false
-        //网页功能的设置
         // devTools:false//是否开启 DevTools
         // webSecurity: false//是否禁用同源策略
       }

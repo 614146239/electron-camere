@@ -2,18 +2,18 @@ import { Menu, MenuItemConstructorOptions } from 'electron'
 
 const menu = (mainWindow) => {
   const template = [
-    {
-      label: '设置',
-      click: () => {
-        mainWindow.webContents.send('href', 'setting')
-      }
-    },
-    {
-      label: '屏幕录制',
-      click: () => {
-        mainWindow.webContents.send('href', 'index')
-      }
-    }
+    // {
+    //   label: '设置',
+    //   click: () => {
+    //     mainWindow.webContents.send('href', 'setting')
+    //   }
+    // },
+    // {
+    //   label: '屏幕录制',
+    //   click: () => {
+    //     mainWindow.webContents.send('href', 'index')
+    //   }
+    // }
   ] as MenuItemConstructorOptions[]
 
   // 固定写法

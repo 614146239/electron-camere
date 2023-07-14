@@ -1,5 +1,13 @@
 <template>
   <div class="setting">
+    <el-progress
+      v-if="percentage"
+      :text-inside="true"
+      :percentage="percentage"
+      :stroke-width="15"
+      striped
+      striped-flow
+    />
     <el-form :model="config" label-width="auto">
       <el-form-item label="选择摄像头">
         <el-select v-model="constraints.video.deviceId" placeholder="选择摄像头">
@@ -57,7 +65,7 @@
 <script setup lang="ts">
 import { useStore } from '../store/index'
 import { ElNotification } from 'element-plus'
-import { reactive, ref } from 'vue'
+import { reactive, ref, onMounted } from 'vue'
 import { createWindow } from '../store/createWindow'
 const win = createWindow()
 const store = useStore()
@@ -108,6 +116,12 @@ const submit = (): void => {
     win.cameraWindow()
   }
 }
+const percentage = ref(0)
+onMounted(() => {
+  window.electron.downloadProgress((_, progress) => {
+    percentage.value = Math.floor(progress.percent)
+  })
+})
 </script>
 
 <style scoped lang="less">
@@ -115,8 +129,14 @@ const submit = (): void => {
   width: 100%;
   height: 100%;
   background-color: rgb(44, 62, 80);
-  padding: 40px 40px;
-
+  .el-form {
+    padding: 40px 40px 20px;
+  }
+  .el-button {
+    display: block;
+    width: 80%;
+    margin: 0 auto;
+  }
   :deep(.el-form-item__label) {
     color: #fff;
   }

@@ -179,3 +179,14 @@ win.loadFile(path.join(__dirname, '../renderer/index.html'), { hash: 'home' })
     "allowToChangeInstallationDirectory": true
   }
 }
+<!-- electron打包上传git releases 自动更新 -->
+ "publish": [
+    {
+      "provider": "github",
+      "owner": "614146239",
+      "repo": "electron-camere",
+      "releaseType": "release"
+    }
+  ]
+   windows下添加环境变量GH_TOKEN
+生成地址https://github.com/settings/tokens，之后添加环境变量

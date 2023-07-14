@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 // 自动更新
 import { is } from '@electron-toolkit/utils'
-import { BrowserWindow, dialog } from 'electron'
+import { dialog, shell } from 'electron'
 import { autoUpdater } from 'electron-updater'
 //自动下载更新
 autoUpdater.autoDownload = false
 //退出时自动安装更新
 autoUpdater.autoInstallOnAppQuit = false
 
-export default (win: BrowserWindow) => {
+const autoUpdate = (win) => {
   //检查是否有更新
   if (!is.dev) autoUpdater.checkForUpdates()
 
@@ -31,13 +31,13 @@ export default (win: BrowserWindow) => {
   })
 
   //没有新版本时
-  autoUpdater.on('update-not-available', (_info: any) => {
-    win.webContents.send('version', _info.tag)
-    // dialog.showMessageBox({
-    //   type: 'info',
-    //   message: `${_info}-${JSON.stringify(_info)}`
-    // })
-  })
+  // autoUpdater.on('update-not-available', (_info: any) => {
+  //   // win.webContents.send('version', _info?.tag)
+  //   dialog.showMessageBox({
+  //     type: 'info',
+  //     message: `${_info}-${JSON.stringify(_info)}`
+  //   })
+  // })
 
   //更新下载完毕
   autoUpdater.on('update-downloaded', (_info) => {
@@ -47,19 +47,19 @@ export default (win: BrowserWindow) => {
 
   //更新发生错误
   autoUpdater.on('error', (_info) => {
-    // dialog
-    //   .showMessageBox({
-    //     type: 'warning',
-    //     title: '更新提示',
-    //     message: '软件更新失败',
-    //     buttons: ['网站下载', '取消更新'],
-    //     cancelId: 1
-    //   })
-    //   .then((res) => {
-    //     if (res.response == 0) {
-    //       shell.openExternal('https://app.houdunren.com')
-    //     }
-    //   })
+    dialog
+      .showMessageBox({
+        type: 'warning',
+        title: '更新提示',
+        message: '软件更新失败',
+        buttons: ['网站下载', '取消更新'],
+        cancelId: 1
+      })
+      .then((res) => {
+        if (res.response == 0) {
+          shell.openExternal('https://github.com/614146239/electron-camere/releases')
+        }
+      })
   })
 
   // 监听下载进度
@@ -67,3 +67,5 @@ export default (win: BrowserWindow) => {
     win.webContents.send('downloadProgress', progress)
   })
 }
+
+export default autoUpdate

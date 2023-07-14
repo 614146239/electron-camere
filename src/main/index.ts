@@ -10,18 +10,19 @@ import './setUserTasks'
 // 托盘
 import { createTray } from './tray'
 // 更新
-import './autoUpdater'
-
-// 拖动
-// import drag from './drag'
+import autoUpdate from './autoUpdater'
 
 // 窗口类
 import Window from './createWin'
 const window = new Window()
 
 function createWindow(): void {
+  // 只能开启一个应用，不能多开
+  const gotTheLock = app.requestSingleInstanceLock()
+  if (!gotTheLock) {
+    app.quit()
+  }
   // 创建浏览器窗口
-
   const mainWindow = window.createWindows({
     width: 600,
     height: 600,
@@ -46,22 +47,18 @@ function createWindow(): void {
     }
   })
   window.listen()
-
+  // mainWindow?.webContents.openDevTools()
   // 长宽比率为1
   // mainWindow.setAspectRatio(1)
-
   // 创建系统托盘
   createTray(mainWindow)
-  // 录制屏幕
-  // screenCapturer()
   // 设置dock图标
   if (process.platform === 'darwin') {
     app.dock.setIcon(icon)
   }
   //右键菜单
   menu(mainWindow)
-  // 拖动
-  // drag(mainWindow)
+  autoUpdate(mainWindow)
 }
 // 这段程序将会在 Electron 结束初始化
 // 和创建浏览器窗口的时候调用
