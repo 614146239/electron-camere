@@ -26,8 +26,9 @@ export default defineConfig({
           /\.vue\?vue/, // .vue
           /\.md$/ // .md
         ],
-        resolvers: [ElementPlusResolver()],
-        imports: ['vue', 'pinia']
+        resolvers: [ElementPlusResolver()]
+        // 自动引入
+        // imports: ['vue', 'pinia']
       }),
       Components({
         resolvers: [ElementPlusResolver()]
