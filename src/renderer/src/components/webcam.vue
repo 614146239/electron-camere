@@ -72,13 +72,13 @@ const canvasSegmentation = ref()
 const containRef = ref()
 const tracks = ref()
 const loopRender = ref()
-
+const windowWidth = window.innerWidth
+const windowHeight = window.innerHeight
 const route = useRoute()
 const { data: faceModel }: { data: any } = useBroadcastChannel({
   name: 'faceModel'
 })
 let faces
-
 // 数据要从store中存储
 const store = useStore()
 let config = store.config
@@ -98,6 +98,17 @@ onMounted(async () => {
   navigator.mediaDevices.getUserMedia({ video: constraints.video }).then((stream) => {
     video.srcObject = stream
     tracks.value = stream.getTracks()
+    // const capabilities = tracks.value.getCapabilities()
+    // for (const option of capabilities.width) {
+    //   if (option > constraints.video.width) {
+    //     constraints.video.width = option
+    //   }
+    // }
+    // for (const option of capabilities.height) {
+    //   if (option > constraints.video.width) {
+    //     constraints.video.width = option
+    //   }
+    // }
   })
   //tf
   tf.setBackend('webgl')
@@ -233,10 +244,14 @@ onMounted(async () => {
   const scene = new Scene()
   //添加一些光照
   scene.add(new AmbientLight(0xcccccc, 0.4))
-  // const camera = new PerspectiveCamera(45, 1, 0.1, 1000)
-  const w = window.innerWidth
-  const h = window.innerHeight
-  const camera = new OrthographicCamera(w / -2, w / 2, h / 2, h / -2, 0.1, 2000)
+  const camera = new OrthographicCamera(
+    windowWidth / -2,
+    windowWidth / 2,
+    windowHeight / 2,
+    windowHeight / -2,
+    0.1,
+    2000
+  )
   camera.position.set(0, 0, 1000)
   camera.add(new PointLight(0xffffff, 0.8))
   camera.position.set(0, 0, 0.15)
@@ -248,35 +263,6 @@ onMounted(async () => {
   })
   renderer.setPixelRatio(window.devicePixelRatio)
   renderer.setSize(window.innerWidth, window.innerHeight)
-  // 监听屏幕改变canvas
-  window.addEventListener('resize', () => {
-    if (!config.isFullScreen) {
-      window.api.resize(Number(route.query.id), config.isCircle)
-    }
-    // const windowAspectRatio = window.innerWidth / window.innerHeight
-    // const videoAspectRatio = video.videoWidth / video.videoHeight
-
-    // let newWidth: number, newHeight: number
-
-    // if (windowAspectRatio > videoAspectRatio) {
-    //   newWidth = window.innerWidth
-    //   newHeight = window.innerWidth / videoAspectRatio
-    //   videoTexture.repeat.set(1, videoAspectRatio / windowAspectRatio)
-    //   videoTexture.offset.y = (1 - videoAspectRatio / windowAspectRatio) / 2
-    // } else {
-    //   newWidth = window.innerHeight * videoAspectRatio
-    //   newHeight = window.innerHeight
-    //   videoTexture.repeat.set(windowAspectRatio / videoAspectRatio, 1)
-    //   videoTexture.offset.x = (1 - windowAspectRatio / videoAspectRatio) / 2
-    // }
-    // // 更新视频和渲染器的大小
-    // video.width = newWidth
-    // video.height = newHeight
-    // 更新相机和投影矩阵
-    camera.updateProjectionMatrix()
-    renderer.setPixelRatio(window.devicePixelRatio)
-    renderer.setSize(window.innerWidth, window.innerHeight)
-  })
 
   // 视频纹理
   let videoTexture
@@ -431,10 +417,10 @@ onMounted(async () => {
   // }
   //从人脸检测模型获取的人脸网格坐标转换为模型位置
   const resolveMesh = (faceMesh, videoWidth, videoHeight): [] => {
-    const canvasWidth = renderer.domElement.width
-    const canvasHeight = renderer.domElement.height
-    const scaleX = canvasWidth / videoWidth
-    const scaleY = canvasHeight / videoHeight
+    const canvasWidth = windowWidth
+    const canvasHeight = windowHeight
+    const scaleX = canvasWidth / video.videoWidth
+    const scaleY = canvasHeight / video.videoHeight
     return faceMesh
       .map((p: number[]) => [
         (p[0] - videoWidth / 2) * scaleX,
@@ -445,15 +431,10 @@ onMounted(async () => {
   }
   // updateGeometry方法用于更新Three.js场景中的几何体（geometry），以便根据检测到的人脸关键点的位置进行渲染。
   const updateGeometry = (prediction): void => {
-    const positionBuffer = resolveMesh(
-      prediction,
-      videoRef.value.videoWidth,
-      videoRef.value.videoHeight
-    )
+    const positionBuffer = resolveMesh(prediction, video.videoWidth, video.videoHeight)
     videoTexture.needsUpdate = true
     geometry.setAttribute('position', new Float32BufferAttribute(positionBuffer, 3))
     geometry.computeVertexNormals()
-    geometry.setAttribute('uv', uvAttribute)
     geometry.attributes.uv.needsUpdate = true
     geometry.attributes.position.needsUpdate = true
   }
@@ -477,6 +458,16 @@ onMounted(async () => {
   video.addEventListener('loadeddata', async () => {
     video.style.display = 'none'
     render()
+  })
+  // 监听屏幕改变canvas
+  window.addEventListener('resize', () => {
+    if (!config.isFullScreen) {
+      window.api.resize(Number(route.query.id), config.isCircle)
+    }
+    // // 更新相机和投影矩阵
+    camera.updateProjectionMatrix()
+    renderer.setPixelRatio(window.devicePixelRatio)
+    renderer.setSize(window.innerWidth, window.innerHeight)
   })
 })
 
@@ -505,6 +496,7 @@ watch(webCam, () => {
   borderStyle.borderRadius = config.isCircle ? '50%' : '5%'
   window.api.changeShape(route.query.id, window.innerHeight, config.isCircle)
 })
+
 // 关闭所有流媒体
 onBeforeUnmount(() => {
   cancelAnimationFrame(loopRender.value)

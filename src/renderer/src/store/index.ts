@@ -40,17 +40,20 @@ export const useStore = defineStore('store', {
           // 画面比例
           // aspectRatio: 16 / 9,
           // 设备ID，可以从enumerateDevices中获取
-          deviceId: ''
+          deviceId: '',
           // 摄像头前后置模式，一般适用于手机
           // facingMode: ConstrainDOMString
           // 帧率，采集视频的目标帧率
-          // frameRate: ConstrainDouble
+          frameRate: {
+            ideal: 60,
+            min: 10
+          },
           // 组ID，用一个设备的输入输出的组ID是同一个
           // groupId: ConstrainDOMString
           // 视频高度
-          // height: ConstrainULong
+          height: { ideal: 720 }, // 设置理想高度为720px
           // 视频宽度
-          // width: ConstrainULong
+          width: { ideal: 1280 } // 设置理想宽度为1280px
         },
         // 麦克风
         audio: {

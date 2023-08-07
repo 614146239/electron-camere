@@ -72,6 +72,7 @@ const audioTracks = ref()
 const time = ref(0)
 const recordTimer = ref()
 const formatTime = ref('00:00:00')
+
 // 录制时间
 const recordTime = (): void => {
   clearInterval(recordTimer.value)
