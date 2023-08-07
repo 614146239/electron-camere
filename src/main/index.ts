@@ -24,14 +24,12 @@ function createWindow(): void {
   }
   // 创建浏览器窗口
   const mainWindow = window.createWindows({
-    width: 600,
+    width: 800,
     height: 600,
     show: false,
     isMainWin: true,
     autoHideMenuBar: true, //自动隐藏菜单栏
     alwaysOnTop: false, //是否保持在最上层
-    // frame: false, //windows去除标题栏和窗口控制按钮
-    transparent: true, //窗口背景透明
     skipTaskbar: false, //是否在任务栏中显示窗口
     resizable: true, //窗口是否可以改变尺寸
     minWidth: 200,
@@ -40,10 +38,10 @@ function createWindow(): void {
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
-      sandbox: false
+      sandbox: false,
       //网页功能的设置
-      // devTools:false//是否开启 DevTools
-      // webSecurity: false//是否禁用同源策略
+      // devTools: false, //是否开启 DevTools
+      webSecurity: false //是否禁用同源策略
     }
   })
   window.listen()

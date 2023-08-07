@@ -11,11 +11,28 @@ export const useStore = defineStore('store', {
       cameraArr: [] as DeviceArr[],
       audioArr: [] as DeviceArr[],
       config: {
-        borderWidth: '',
+        borderWidth: 1,
         borderColor: '',
         reverse: true,
         isRecording: false,
-        isWebcam: true
+        isWebcam: false,
+        isCircle: true,
+        isFullScreen: false
+      },
+      faceModelConfig: {
+        modelUrl: '',
+        isFaceModel: false
+      },
+      backgroundCutConfig: {
+        isCut: false,
+        bokehOrSwitch: false,
+        foregroundThreshold: 0.5,
+        backgroundBlurAmount: 3,
+        edgeBlurAmount: 3,
+        // 背景
+        opacity: 0.7,
+        maskBlurAmount: 3,
+        backdropImg: ''
       },
       constraints: {
         // 摄像头
@@ -37,9 +54,8 @@ export const useStore = defineStore('store', {
         },
         // 麦克风
         audio: {
-          muted: true,
           // 是否开启AGC自动增益，可以在原有音量上增加额外的音量
-          // autoGainControl: ConstrainBoolean
+          autoGainControl: true,
           // 声道配置
           // channelCount: ConstrainULong
           // 设备ID，可以从enumerateDevices中获取
@@ -102,8 +118,6 @@ export const useStore = defineStore('store', {
     },
     // 关闭窗口
     closeWindow(winId) {
-      console.log(window.api)
-
       window.api.closeWindow(winId)
     }
   },

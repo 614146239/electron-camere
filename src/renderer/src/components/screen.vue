@@ -37,7 +37,7 @@
     </div>
     <div class="recoder">
       <button v-if="recorder" @click="endRecorder">保存</button>
-      <button v-else @click="beginRecorder">录制</button>
+      <button v-else @click="readyRecoder">录制</button>
     </div>
     <div class="nav-item" @click="closeRecordWindow">
       <el-icon color="#fff"><CloseBold /></el-icon>
@@ -46,7 +46,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, toRaw, onBeforeUnmount } from 'vue'
 import { useStore } from '../store/index'
 import { useRoute } from 'vue-router'
 import { createWindow } from '../store/createWindow'
@@ -59,11 +59,12 @@ onMounted(() => {
 })
 const store = useStore()
 const config = store.config
-const audio = store.constraints.audio
+const audio = toRaw(store.constraints.audio)
+const sourceId = ref()
 // 录制视频
 const recorder = ref()
 let mediaStream: MediaStream
-let chunks = [] as any
+const chunks = ref()
 const muted = ref(false)
 const audioStream = ref()
 const vidioStream = ref()
@@ -86,6 +87,7 @@ const recordTime = (): void => {
     formatTime.value = `${hours}:${minutes}:${seconds}`
   }, 1000)
 }
+
 // 停止录制时间
 const stopRecodTime = (): void => {
   clearInterval(recordTimer.value)
@@ -106,7 +108,7 @@ const toggleMute = (): void => {
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 const getAudio = async () => {
   try {
-    // if (recorder && recorder.state == 'recording') {
+    // if (recorder.value && recorder.value.state == 'recording') {
     audioStream.value = await navigator.mediaDevices.getUserMedia({
       audio: audio
     })
@@ -133,12 +135,12 @@ const createRecorder = (vidioStream, audioStream): void => {
     ...audioStream.value.getAudioTracks()
   ])
 
-  recorder.value = new MediaRecorder(mediaStream)
+  recorder.value = new MediaRecorder(mediaStream, { mimeType: 'video/webm; codecs=vp9' })
   recorder.value.start()
   // 录制时间
   recordTime()
-  recorder.value.addEventListener('dataavailable', (e: BlobEvent) => {
-    chunks.push(e.data)
+  recorder.value.addEventListener('dataavailable', (event: { data: any }) => {
+    chunks.value.push(event.data)
   })
   recorder.value.onerror = (err): void => {
     console.error(err)
@@ -168,50 +170,58 @@ const endRecorder = (): void => {
     stopAudio()
     stopRecodTime()
     recorder.value.addEventListener('stop', () => {
-      const blob = new Blob(chunks, { type: 'video/webm;codecs=vp9' })
+      const blob = new Blob(chunks.value, { type: 'video/webm;codecs=vp9' })
+      // const blob = new Blob(chunks.value, { type: 'video/mp4' })
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
       const currentTime = new Date()
-      a.download = `${currentTime.toLocaleString()}.mp4`
+      a.download = `${currentTime.toLocaleString()}.webm`
       a.click()
     })
     recorder.value = null
-    chunks = []
+    chunks.value = []
   }
 }
 
-const beginRecorder = async (): Promise<void> => {
-  // bug 主进程异步消息第一次无法返回窗口id
-  const sourceId = await window.api.recording()
-  try {
-    const constraints = {
-      audio: {
-        mandatory: {
-          // 无需指定mediaSourceId就可以录音了，录得是系统音频
-          chromeMediaSource: 'desktop'
-        }
-      },
-      video: {
-        mandatory: {
-          chromeMediaSource: 'desktop',
-          chromeMediaSourceId: sourceId,
-          width: { ideal: 1920 },
-          height: { ideal: 1080 },
-          codec: 'vp9',
-          // 帧率
-          maxFrameRate: 60
-        }
+const readyRecoder = async (): Promise<void> => {
+  win.countDownWindow()
+
+  sourceId.value = await window.api.recording()
+  const constraints = {
+    audio: {
+      mandatory: {
+        // 无需指定mediaSourceId就可以录音了，录得是系统音频
+        chromeMediaSource: 'desktop'
+      }
+    },
+    video: {
+      mandatory: {
+        chromeMediaSource: 'desktop',
+        chromeMediaSourceId: sourceId.value,
+        width: { ideal: screen.width },
+        height: { ideal: screen.height },
+        codec: 'vp9'
+        // 帧率
+        // maxFrameRate: 60
       }
     }
-    // 指定屏幕id只能使用getUserMedia
-    vidioStream.value = await navigator.mediaDevices.getUserMedia(constraints as any)
-    // 音频
-    await getAudio()
-    createRecorder(vidioStream, audioStream)
-  } catch (e) {
-    console.error(e)
   }
+
+  // 指定屏幕id只能使用getUserMedia
+  vidioStream.value = await navigator.mediaDevices.getUserMedia(constraints as any)
+  // 音频
+  await getAudio()
+}
+const channel = new BroadcastChannel('recoder')
+channel.addEventListener('message', (e) => {
+  if (e.data) {
+    beginRecorder()
+  }
+})
+// 合并录制视频音频
+const beginRecorder = async (): Promise<void> => {
+  createRecorder(vidioStream, audioStream)
 }
 // 打开摄像头
 const openCamera = (): void => {
@@ -225,8 +235,12 @@ const closeCamera = (): void => {
   // config.isWebcam = false
 }
 const closeRecordWindow = (): void => {
+  // 关闭之前建议是否考虑是否录制中保存
   store.closeWindow(route.query.id)
 }
+onBeforeUnmount(() => {
+  channel.close()
+})
 </script>
 <style scoped lang="less">
 * {
@@ -273,5 +287,18 @@ const closeRecordWindow = (): void => {
 }
 .el-icon {
   font-size: 25px;
+}
+.recoder {
+  button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 60px;
+    height: 30px;
+    font-weight: bold;
+    background-color: #2dc7cc;
+    border-radius: 10px;
+    border: none;
+  }
 }
 </style>

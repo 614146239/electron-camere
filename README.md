@@ -87,6 +87,26 @@ button { -webkit-app-region: no-drag; }
 进程通讯多次触发情况下使用 `ipcRenderer.once`和 `ipcRenderer.on`一样
 
 
+
+
+<!-- 窗口通讯 -->
+窗口通讯，相当于浏览器选项卡中不同页面进行通讯
+发送
+const channel = new BroadcastChannel('modelUrl')
+  channel.postMessage(item.path)
+  接收
+const channel = new BroadcastChannel('modelUrl')
+  channel.addEventListener('message', function (e) {
+    <!-- e.data为传输数据 -->
+    })
+  })
+
+<!-- 关闭当前窗口 -->
+import { useStore } from '../store/index'
+import { useRoute } from 'vue-router'
+const route = useRoute()
+const store = useStore()
+ store.closeWindow(route.query.id)
 <!--  -->
 
 录制屏幕

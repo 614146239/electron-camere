@@ -25,6 +25,15 @@ const api = {
   // 关闭窗口
   closeWindow: (winId) => {
     ipcRenderer.send('closeWindow', winId)
+  },
+  resize: (winId: number, isCircle: boolean) => {
+    ipcRenderer.send('resize', winId, isCircle)
+  },
+  changeShape: (winId, width, isCircle) => {
+    ipcRenderer.send('changeShape', winId, width, isCircle)
+  },
+  setFullScreen: (winId, isFullScreen) => {
+    ipcRenderer.send('setFullScreen', winId, isFullScreen)
   }
 }
 // 主进程向渲染进程

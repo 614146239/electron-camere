@@ -12,7 +12,4 @@
     "auto-imports.d.ts", // 此处引入该声明文件
   ],
   "baseUrl": "./",
-  "paths": {
-    "@/*": ["src/*"]
-  }
 }

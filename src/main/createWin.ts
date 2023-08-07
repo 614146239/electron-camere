@@ -24,7 +24,6 @@ interface windowArr {
   id: string | number
   path?: string
 }
-
 class Window {
   main: null
   windowArr: windowArr[]
@@ -39,18 +38,14 @@ class Window {
       show: false,
       autoHideMenuBar: true, //自动隐藏菜单栏
       alwaysOnTop: false, //是否保持在最上层
-      // frame: false, //windows去除标题栏和窗口控制按钮
-      transparent: true, //窗口背景透明
       skipTaskbar: true, //是否在任务栏中显示窗口
       resizable: true, //窗口是否可以改变尺寸
       titleBarStyle: 'default', //mac下隐藏导航栏
-      // icon: icon,
-      // ...(process.platform === 'linux' ? { icon } : {}),
+      maximizable: true,
       webPreferences: {
         preload: join(__dirname, '../preload/index.js'),
-        sandbox: false
-        // devTools:false//是否开启 DevTools
-        // webSecurity: false//是否禁用同源策略
+        sandbox: false,
+        webSecurity: false //是否禁用同源策略
       }
     }
   }
@@ -62,6 +57,7 @@ class Window {
   getAllWindows() {
     return BrowserWindow.getAllWindows()
   }
+
   // 创建窗口
   createWindows(options: BrowserWindowConstructorOptions & Config) {
     const windowConfig = Object.assign({}, this.defaultConfig(), options)
@@ -124,15 +120,12 @@ class Window {
         win.hide()
       }
     })
-
     win.webContents.setWindowOpenHandler((details) => {
       shell.openExternal(details.url)
       return { action: 'deny' }
     })
-
     const icon = nativeImage.createFromPath(join(__dirname, '../../resources/windowTray.png'))
     win.setIcon(icon)
-
     return win
   }
   listen() {
@@ -162,6 +155,40 @@ class Window {
           width: winBounds.width,
           height: winBounds.height
         })
+      }
+    })
+    // 窗口按比例放大缩小
+    ipcMain.on('resize', (_, winId, isCircle) => {
+      if (winId) {
+        const win = this.getWindow(Number(winId))
+        // console.log(isCircle)
+        if (isCircle) {
+          win?.setAspectRatio(1)
+        } else {
+          win?.setAspectRatio(4 / 3)
+        }
+      }
+    })
+    // 切换窗口形态
+    ipcMain.on('changeShape', (_, winId, width, isCircle) => {
+      if (winId) {
+        const win = this.getWindow(Number(winId))
+        if (isCircle) {
+          win?.setSize(width, width)
+        } else {
+          // 长边
+          // win?.setSize(width, (width * 3) / 4)
+          // 短边
+          win?.setSize(Math.trunc((width * 4) / 3), width)
+        }
+      }
+    })
+    // 窗口全屏
+    ipcMain.on('setFullScreen', (_, winId, isFullScreen) => {
+      if (winId) {
+        const win = this.getWindow(Number(winId))
+        win?.setAspectRatio(0)
+        win?.setFullScreen(isFullScreen)
       }
     })
   }
