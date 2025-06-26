@@ -6,14 +6,22 @@
     <div ref="settingRef" class="setting">
       <div class="until">
         <div class="icon">
-          <el-icon @click="closeWindow"><SwitchButton /></el-icon>
+          <el-icon @click="closeWindow">
+            <SwitchButton />
+          </el-icon>
         </div>
         <div class="icon">
-          <el-icon v-if="!config.isFullScreen" @click="fullScreen"><FullScreen /></el-icon>
-          <el-icon v-else @click="exitFullScreen"><Crop /></el-icon>
+          <el-icon v-if="!config.isFullScreen" @click="fullScreen">
+            <FullScreen />
+          </el-icon>
+          <el-icon v-else @click="exitFullScreen">
+            <Crop />
+          </el-icon>
         </div>
         <div class="icon">
-          <el-icon @click="overturn"><Switch /></el-icon>
+          <el-icon @click="overturn">
+            <Switch />
+          </el-icon>
         </div>
       </div>
     </div>
@@ -150,8 +158,8 @@ onMounted(async () => {
   const segmenter = await bodySegmentation.createSegmenter(bodyModel, {
     runtime: 'mediapipe',
     modelType: 'landscape', // 'general', 'landscape
-    // solutionPath: '../../src/assets/model/@mediapipe/selfie_segmentation'
-    solutionPath: 'https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation'
+    solutionPath: '../../src/assets/model/@mediapipe/selfie_segmentation'
+    // solutionPath: 'https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation'
   })
   const loadImage = (url: string): Promise<HTMLImageElement> => {
     return new Promise((resolve, reject) => {
@@ -249,8 +257,8 @@ onMounted(async () => {
     windowWidth / 2,
     windowHeight / 2,
     windowHeight / -2,
-    0.1,
-    2000
+    100,
+    1000
   )
   camera.position.set(0, 0, 1000)
   camera.add(new PointLight(0xffffff, 0.8))
@@ -263,7 +271,6 @@ onMounted(async () => {
   })
   renderer.setPixelRatio(window.devicePixelRatio)
   renderer.setSize(window.innerWidth, window.innerHeight)
-
   // 视频纹理
   let videoTexture
   if (backgroundCutConfig.isCut) {
@@ -280,19 +287,25 @@ onMounted(async () => {
   //
   const canvasWidth = canvas.clientWidth
   const canvasHeight = canvas.clientHeight
+
   // 计算宽高比例
   const aspectRatio = canvasWidth / canvasHeight
   //
   // 创建材质大小和canvas大小一致
-  const videoGeometry = new PlaneGeometry(canvasWidth, canvasWidth / aspectRatio)
-  const videoMaterial = new MeshBasicMaterial({
-    map: videoTexture
+  let videoMaterial, videoCube
+  video.addEventListener('loadeddata', async () => {
+    // const videoWidth = video.videoWidth
+    // const videoHeight = video.videoHeight
+    // const videoAspectRatio = videoWidth / videoHeight
+    const videoGeometry = new PlaneGeometry(canvasWidth, canvasWidth / aspectRatio)
+    videoMaterial = new MeshBasicMaterial({
+      map: videoTexture
+    })
+    videoCube = new Mesh(videoGeometry, videoMaterial)
+    videoCube.position.set(0, 0, -800)
+    scene.add(videoCube)
+    camera.lookAt(videoCube.position)
   })
-  const videoCube = new Mesh(videoGeometry, videoMaterial)
-  videoCube.position.set(0, 0, -800)
-  scene.add(videoCube)
-  camera.lookAt(videoCube.position)
-
   //创建geometry，将468个人脸特征点按照一定的顺序(TRIANGULATION)组成三角网格，并加载UV_COORDS
   const geometry = new BufferGeometry()
   // 设置连接顺序
@@ -303,6 +316,7 @@ onMounted(async () => {
     uvCoords.flat().map((item, index) => ((index + 1) % 2 ? item : 1 - item)),
     2
   )
+
   // 创建几何体对象并将顶点和 UV 属性设置给它
   geometry.setAttribute('uv', uvAttribute)
   // 创建material  加载贴图
@@ -324,6 +338,8 @@ onMounted(async () => {
   // 跨页面通信
   watch(faceModel, () => {
     faceModelConfig = JSON.parse(faceModel.value)
+    console.log(faceModelConfig)
+
     faceMaterial.map = textureLoader.load(faceModelConfig.modelUrl, (texture) => {
       texture.colorSpace = SRGBColorSpace
       texture.anisotropy = 16
@@ -419,13 +435,14 @@ onMounted(async () => {
   const resolveMesh = (faceMesh, videoWidth, videoHeight): [] => {
     const canvasWidth = windowWidth
     const canvasHeight = windowHeight
+
     const scaleX = canvasWidth / video.videoWidth
     const scaleY = canvasHeight / video.videoHeight
     return faceMesh
       .map((p: number[]) => [
         (p[0] - videoWidth / 2) * scaleX,
         (videoHeight / 2 - p[1]) * scaleY,
-        -p[2] - 100
+        -p[2] - 500
       ])
       .flat()
   }
@@ -440,6 +457,8 @@ onMounted(async () => {
   }
   // 控制场景渲染
   const render = async (): Promise<void> => {
+    // console.log('执行render')
+
     // 背景替换
     if (backgroundCutConfig.isCut) {
       await backgroundReplace()
@@ -456,8 +475,8 @@ onMounted(async () => {
     loopRender.value = requestAnimationFrame(render)
   }
   video.addEventListener('loadeddata', async () => {
-    video.style.display = 'none'
     render()
+    video.style.display = 'none'
   })
   // 监听屏幕改变canvas
   window.addEventListener('resize', () => {
@@ -514,39 +533,47 @@ onBeforeUnmount(() => {
   overflow: hidden;
   z-index: 9999;
   position: relative;
+
   &:hover > .setting {
     display: block;
   }
 }
+
 video {
   width: 100%;
   height: 100%;
   // display: none;
   object-fit: cover;
 }
+
 .threeJs {
   z-index: 99999;
 }
+
 .none {
   // width: 100%;
   // height: 100%;
   display: none;
   // object-fit: cover;
 }
+
 .reverse {
   // 切换镜像，video旋转y轴180
   transform: rotateY(180deg);
 }
+
 .setting {
   position: absolute;
   bottom: 8vh;
   left: 50%;
   transform: translateX(-50%);
   display: none;
+
   .until {
     width: 100%;
     display: flex;
   }
+
   .el-icon {
     width: 8vw;
     font-size: min(5vw, 40px);

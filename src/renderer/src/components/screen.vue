@@ -3,32 +3,44 @@
     <div v-if="recorder" class="rec">REC</div>
     <div class="audio">
       <div v-if="muted" class="nav-item">
-        <el-icon color="red" @click="toggleMute"><Microphone /></el-icon>
+        <el-icon color="red" @click="toggleMute">
+          <Microphone />
+        </el-icon>
         <p>录音</p>
       </div>
       <div v-else class="nav-item">
-        <el-icon color="#fff" @click="toggleMute"><Mute /></el-icon>
+        <el-icon color="#fff" @click="toggleMute">
+          <Mute />
+        </el-icon>
         <p>静音</p>
       </div>
     </div>
 
     <div class="stopRecoder">
       <div v-if="recorder?.state === 'recording'" class="nav-item" @click="stop">
-        <el-icon color="red"><Platform /></el-icon>
+        <el-icon color="red">
+          <Platform />
+        </el-icon>
         <p>录制中</p>
       </div>
       <div v-else class="nav-item">
-        <el-icon color="#fff" @click="stop"><VideoPlay /></el-icon>
+        <el-icon color="#fff" @click="stop">
+          <VideoPlay />
+        </el-icon>
         <p>暂停</p>
       </div>
     </div>
     <div class="camera">
       <div v-if="config.isWebcam" class="nav-item" @click="closeCamera">
-        <el-icon color="red"><CameraFilled /></el-icon>
+        <el-icon color="red">
+          <CameraFilled />
+        </el-icon>
         <p>开启</p>
       </div>
       <div v-else class="nav-item" @click="openCamera">
-        <el-icon color="#fff"><Camera /></el-icon>
+        <el-icon color="#fff">
+          <Camera />
+        </el-icon>
         <p>关闭</p>
       </div>
     </div>
@@ -40,7 +52,9 @@
       <button v-else @click="readyRecoder">录制</button>
     </div>
     <div class="nav-item" @click="closeRecordWindow">
-      <el-icon color="#fff"><CloseBold /></el-icon>
+      <el-icon color="#fff">
+        <CloseBold />
+      </el-icon>
       <p>关闭</p>
     </div>
   </div>
@@ -137,6 +151,8 @@ const createRecorder = (vidioStream, audioStream): void => {
   ])
 
   recorder.value = new MediaRecorder(mediaStream, { mimeType: 'video/webm; codecs=vp9' })
+  // recorder.value = new MediaRecorder(mediaStream, { mimeType: 'video/mp4' })
+
   recorder.value.start()
   // 录制时间
   recordTime()
@@ -171,13 +187,15 @@ const endRecorder = (): void => {
     stopAudio()
     stopRecodTime()
     recorder.value.addEventListener('stop', () => {
-      const blob = new Blob(chunks.value, { type: 'video/webm;codecs=vp9' })
+      // const blob = new Blob(chunks.value, { type: 'video/webm;codecs=vp9' })
+      const blob = new Blob(chunks.value, { type: 'video/mp4' })
+
       // const blob = new Blob(chunks.value, { type: 'video/mp4' })
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
       const currentTime = new Date()
-      a.download = `${currentTime.toLocaleString()}.webm`
+      a.download = `${currentTime.toLocaleString()}.mp4`
       a.click()
     })
     recorder.value = null
@@ -247,6 +265,7 @@ onBeforeUnmount(() => {
 * {
   line-height: 1em;
 }
+
 .navBar {
   width: 100%;
   height: 100%;
@@ -254,12 +273,14 @@ onBeforeUnmount(() => {
   align-items: center;
   justify-content: space-around;
   background-color: rgb(43, 43, 43);
+
   // // 可以拖动窗口
   // -webkit-app-region: drag;
   .time {
     color: #fff;
     font-size: 18px;
   }
+
   .rec {
     width: 40px;
     height: 40px;
@@ -273,12 +294,14 @@ onBeforeUnmount(() => {
     font-size: 14px;
     font-weight: bold;
   }
+
   .nav-item {
     display: flex;
     flex-direction: column;
     align-items: center;
     width: 40px;
     cursor: pointer;
+
     p {
       margin-top: 5px;
       color: #fff;
@@ -286,9 +309,11 @@ onBeforeUnmount(() => {
     }
   }
 }
+
 .el-icon {
   font-size: 25px;
 }
+
 .recoder {
   button {
     display: flex;

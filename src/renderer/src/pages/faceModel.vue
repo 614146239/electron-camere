@@ -25,7 +25,7 @@
 
 <script setup lang="ts">
 import { useStore } from '../store/index'
-import { ref } from 'vue';
+import { ref } from 'vue'
 import { useBroadcastChannel } from '@vueuse/core'
 const store = useStore()
 const faceModelConfig = store.faceModelConfig
@@ -58,6 +58,8 @@ const { post } = useBroadcastChannel({
 const choose = (item: { path: string }): void => {
   choice.value = item.path
   faceModelConfig.modelUrl = item.path
+  console.log(item.path)
+
   post(JSON.stringify(faceModelConfig))
 }
 const changeModel = (bool): void => {
@@ -70,33 +72,39 @@ const changeModel = (bool): void => {
 .page {
   padding: 20px;
   color: #fff;
+
   .isFaceModel {
     margin-bottom: 20px;
     display: flex;
     align-items: center;
+
     label {
       font-weight: bold;
       color: #fff;
       margin-right: 20px;
     }
   }
+
   .module {
     .list {
       width: 100%;
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
       grid-gap: 10px;
+
       // padding: 20px;
       li {
         width: 100%;
         border: 2px solid #1fa059;
         background-color: #4f6174;
+
         img {
           width: 100%;
         }
       }
     }
   }
+
   .chooseItem {
     border: 2px solid red !important;
     background-color: #fff !important;
